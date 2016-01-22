@@ -1,6 +1,6 @@
 {
   "name": "capture-responsive-screenshots",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Captures screenshots at different breakpoints from given URLs as defined in a config file. Uses CasperJS and PhantomJS",
   "main": "main.js",
   "scripts": {
