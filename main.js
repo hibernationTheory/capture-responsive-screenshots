@@ -96,7 +96,6 @@ function main(configFileName, dataFileName, cb) {
 
 	casper.run(function() {
 		cb();
-		this.exit();
 	});
 }
 
