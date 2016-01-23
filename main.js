@@ -20,6 +20,27 @@ function main(configFileName, dataFileName, cb) {
 	    this.echo('remote message caught: ' + message);
 	});
 
+	function createFolderNameFromCurrentDate() {
+		// create a folder name derived from the date and time
+		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var yyyy = today.getFullYear();
+
+		if(dd<10) {
+			dd='0'+dd
+		} 
+
+		if(mm<10) {
+			mm='0'+mm
+		} 
+
+		var todayStr = yyyy+'-'+mm+'-'+dd;
+		var uniquePrefix = new Date().getTime().toString().substr(8);
+		var folderName = todayStr + uniquePrefix;
+		return folderName;
+	}
+
 	function sanitizeStr(givenStr) {
 		// a simple functions to sanitize a given string for filename usage
 		var illegalChrs = ['/','<','>',':','"','\'','/','\\','|','?','*'];
@@ -61,14 +82,16 @@ function main(configFileName, dataFileName, cb) {
 	if (configFileExists) {
 		var configJson = fs.read(configFileName);
 		var config = JSON.parse(configJson);
-		breakpoints = config.breakpoints;
-		pageHeight = config.pageHeight || 2500;
-		waitDuration = config.waitDuration || 1000;
-		imageSaveDir = config.imageSaveDir || './images/';
 	}
-	if (!breakpoints) {
-		breakpoints = [320, 768, 1200];
+
+	breakpoints = config && config.breakpoints || [320, 768, 1200];
+	pageHeight = config && config.pageHeight || 2500;
+	waitDuration = config && config.waitDuration || 1000;
+	imageSaveDir = config && config.imageSaveDir || './images/';
+	if (imageSaveDir.slice(-1) !== '/') {
+		imageSaveDir += '/';
 	}
+	var subDirName = createFolderNameFromCurrentDate() + '/';
 
 	// start the event queue
 	casper.start();
@@ -83,7 +106,7 @@ function main(configFileName, dataFileName, cb) {
 					pageTitle = sanitizeStr(pageTitle);
 					this.echo("Opening the url: " + link + "...");
 					this.wait(waitDuration, function() {
-						var filepath = imageSaveDir + 'pages_' + breakpoint + '_' + pageTitle +'.png'
+						var filepath = imageSaveDir + subDirName + 'pages_' + breakpoint + '_' + pageTitle +'.png'
 						this.capture(filepath);
 						this.echo('Saved the screenshot at: ' + filepath);
 					});
